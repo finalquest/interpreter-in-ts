@@ -1,7 +1,10 @@
-import { isBuiltin } from 'module';
 import { Token, TokenType } from '../token/token';
-import { Keywords, TokenTypes } from '../token/tokenConst';
-import { on } from 'events';
+import {
+  EatableChars,
+  Keywords,
+  TokenMapping,
+  TokenTypes
+} from '../token/tokenConst';
 export type byte = number & { __byte: true };
 
 export type Lexer = {
@@ -40,58 +43,28 @@ const readChar = (l: Lexer): Lexer => {
 export const nextToken = (l: Lexer): [Token, Lexer] => {
   let token: Token;
   const sLexer = skipWhitespace(l);
-  switch (sLexer.ch) {
-    case '='.charCodeAt(0):
-      token = { type: TokenTypes.ASSIGN, literal: '=' };
-      break;
-    case ';'.charCodeAt(0):
-      token = { type: TokenTypes.SEMICOLON, literal: ';' };
-      break;
-    case '('.charCodeAt(0):
-      token = { type: TokenTypes.LPAREN, literal: '(' };
-      break;
-    case ')'.charCodeAt(0):
-      token = { type: TokenTypes.RPAREN, literal: ')' };
-      break;
-    case ','.charCodeAt(0):
-      token = { type: TokenTypes.COMMA, literal: ',' };
-      break;
-    case '+'.charCodeAt(0):
-      token = { type: TokenTypes.PLUS, literal: '+' };
-      break;
-    case '{'.charCodeAt(0):
-      token = { type: TokenTypes.LBRACE, literal: '{' };
-      break;
-    case '}'.charCodeAt(0):
-      token = { type: TokenTypes.RBRACE, literal: '}' };
-      break;
-    case 0:
-      token = { type: TokenTypes.EOF, literal: '' };
-      break;
+  const sCh = sLexer.ch !== 0 ? String.fromCharCode(sLexer.ch) : 'EOF';
+  const t = TokenMapping[sCh];
 
-    default:
-      if (isLetter(sLexer.ch)) {
-        const [literal, lexer] = readIdentifier(sLexer);
-        return [literal, lexer];
-      }
-      if (isDigit(sLexer.ch)) {
-        const [literal, lexer] = readNumber(sLexer);
-        return [literal, lexer];
-      }
-      token = { type: TokenTypes.ILLEGAL, literal: '' };
+  if (!t) {
+    if (isLetter(sLexer.ch)) {
+      const [literal, lexer] = readIdentifier(sLexer);
+      return [literal, lexer];
+    }
+    if (isDigit(sLexer.ch)) {
+      const [literal, lexer] = readNumber(sLexer);
+      return [literal, lexer];
+    }
+    token = { type: TokenTypes.ILLEGAL, literal: '' };
+  } else {
+    token = { type: t, literal: sLexer.ch !== 0 ? sCh : '' };
   }
-
   return [token, readChar(sLexer)];
 };
 
 const skipWhitespace = (l: Lexer): Lexer => {
   let returnLexer = { ...l };
-  while (
-    returnLexer.ch === ' '.charCodeAt(0) ||
-    returnLexer.ch === '\t'.charCodeAt(0) ||
-    returnLexer.ch === '\n'.charCodeAt(0) ||
-    returnLexer.ch === '\r'.charCodeAt(0)
-  ) {
+  while (EatableChars.includes(String.fromCharCode(returnLexer.ch))) {
     returnLexer = readChar(returnLexer);
   }
 

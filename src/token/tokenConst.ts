@@ -1,5 +1,7 @@
 import { TokenType } from './token';
 
+export const EatableChars = [' ', '\t', '\n', '\r'];
+
 export const TokenTypes = {
   ILLEGAL: 'ILLEGAL',
   EOF: 'EOF',
@@ -24,6 +26,22 @@ export const TokenTypes = {
   // Keywords
   FUNCTION: 'FUNCTION',
   LET: 'LET'
+};
+
+export const TokenMapping: { [propKey: string]: TokenType } = {
+  // Operators
+  '=': TokenTypes.ASSIGN,
+  '+': TokenTypes.PLUS,
+
+  // Delimiters
+  ',': TokenTypes.COMMA,
+  ';': TokenTypes.SEMICOLON,
+
+  '(': TokenTypes.LPAREN,
+  ')': TokenTypes.RPAREN,
+  '{': TokenTypes.LBRACE,
+  '}': TokenTypes.RBRACE,
+  EOF: TokenTypes.EOF
 };
 
 export const Keywords: { [propKey: string]: TokenType } = {
