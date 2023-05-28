@@ -50,7 +50,7 @@ describe('Lexer test suite', () => {
     expect(token[0]).toEqual({ type: TokenTypes.INT, literal: '123' });
   });
 
-  test.only('should parse all the token types', async () => {
+  test('should parse all the token types', async () => {
     const input = `let five = 5;
                     let ten = 10;
                     let add = fn(x, y) {
