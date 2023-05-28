@@ -1,4 +1,6 @@
-const TokenTypes = {
+import { TokenType } from './token';
+
+export const TokenTypes = {
   ILLEGAL: 'ILLEGAL',
   EOF: 'EOF',
 
@@ -24,4 +26,7 @@ const TokenTypes = {
   LET: 'LET'
 };
 
-export default TokenTypes;
+export const Keywords: { [propKey: string]: TokenType } = {
+  let: TokenTypes.LET,
+  fn: TokenTypes.FUNCTION
+};
