@@ -63,7 +63,9 @@ if (5 < 10) {
        return true;
    } else {
        return false;
-}`;
+}
+10 == 10;
+10 != 9;`;
 
     const testCases = [
       { type: TokenTypes.LET, literal: 'let' },
@@ -131,6 +133,14 @@ if (5 < 10) {
       { type: TokenTypes.FALSE, literal: 'false' },
       { type: TokenTypes.SEMICOLON, literal: ';' },
       { type: TokenTypes.RBRACE, literal: '}' },
+      { type: TokenTypes.INT, literal: '10' },
+      { type: TokenTypes.EQ, literal: '==' },
+      { type: TokenTypes.INT, literal: '10' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.INT, literal: '10' },
+      { type: TokenTypes.NOT_EQ, literal: '!=' },
+      { type: TokenTypes.INT, literal: '9' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
       { type: TokenTypes.EOF, literal: '' }
     ];
 

@@ -2,6 +2,7 @@ import { Token, TokenType } from '../token/token';
 import {
   EatableChars,
   Keywords,
+  TokenLookAhead,
   TokenMapping,
   TokenTypes
 } from '../token/tokenConst';
@@ -41,10 +42,25 @@ const readChar = (l: Lexer): Lexer => {
 };
 
 export const nextToken = (l: Lexer): [Token, Lexer] => {
-  let token: Token;
-  const sLexer = skipWhitespace(l);
+  let token: Token | undefined;
+  let sLexer = skipWhitespace(l);
   const sCh = sLexer.ch !== 0 ? String.fromCharCode(sLexer.ch) : 'EOF';
-  const t = TokenMapping[sCh];
+  let t = TokenLookAhead[sCh];
+  if (t) {
+    if (sLexer.readPosition >= sLexer.input.length) {
+      t = TokenMapping[sCh];
+    } else if (TokenMapping[t + sLexer.input[sLexer.readPosition]]) {
+      sLexer = readChar(sLexer);
+      const newLiteral = t + String.fromCharCode(sLexer.ch);
+      token = {
+        type: TokenMapping[newLiteral],
+        literal: newLiteral
+      };
+      return [token, readChar(sLexer)];
+    }
+  }
+
+  t = TokenMapping[sCh];
 
   if (!t) {
     if (isLetter(sLexer.ch)) {

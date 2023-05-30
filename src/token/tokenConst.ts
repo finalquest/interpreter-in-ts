@@ -19,7 +19,8 @@ export const TokenTypes = {
   SLASH: '/',
   LT: '<',
   RT: '>',
-
+  EQ: '==',
+  NOT_EQ: '!=',
   // Delimiters
   COMMA: ',',
   SEMICOLON: ';',
@@ -58,7 +59,15 @@ export const TokenMapping: { [propKey: string]: TokenType } = {
   ')': TokenTypes.RPAREN,
   '{': TokenTypes.LBRACE,
   '}': TokenTypes.RBRACE,
+  '==': TokenTypes.EQ,
+  '!=': TokenTypes.NOT_EQ,
   EOF: TokenTypes.EOF
+};
+
+export const TokenLookAhead: { [propKey: string]: TokenType } = {
+  // Operators
+  '=': TokenTypes.ASSIGN,
+  '!': TokenTypes.BANG
 };
 
 export const Keywords: { [propKey: string]: TokenType } = {
