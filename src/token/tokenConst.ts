@@ -31,7 +31,12 @@ export const TokenTypes = {
 
   // Keywords
   FUNCTION: 'FUNCTION',
-  LET: 'LET'
+  LET: 'LET',
+  IF: 'IF',
+  ELSE: 'ELSE',
+  RETURN: 'RETURN',
+  TRUE: 'TRUE',
+  FALSE: 'FALSE'
 };
 
 export const TokenMapping: { [propKey: string]: TokenType } = {
@@ -58,5 +63,10 @@ export const TokenMapping: { [propKey: string]: TokenType } = {
 
 export const Keywords: { [propKey: string]: TokenType } = {
   let: TokenTypes.LET,
-  fn: TokenTypes.FUNCTION
+  fn: TokenTypes.FUNCTION,
+  if: TokenTypes.IF,
+  else: TokenTypes.ELSE,
+  return: TokenTypes.RETURN,
+  true: TokenTypes.TRUE,
+  false: TokenTypes.FALSE
 };

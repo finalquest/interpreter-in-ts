@@ -58,7 +58,13 @@ let ten = 10;
 };
    let result = add(five, ten);
    !-/*5;
-   5 < 10 > 5;`;
+   5 < 10 > 5;
+if (5 < 10) {
+       return true;
+   } else {
+       return false;
+}`;
+
     const testCases = [
       { type: TokenTypes.LET, literal: 'let' },
       { type: TokenTypes.IDENT, literal: 'five' },
@@ -108,6 +114,23 @@ let ten = 10;
       { type: TokenTypes.RT, literal: '>' },
       { type: TokenTypes.INT, literal: '5' },
       { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.IF, literal: 'if' },
+      { type: TokenTypes.LPAREN, literal: '(' },
+      { type: TokenTypes.INT, literal: '5' },
+      { type: TokenTypes.LT, literal: '<' },
+      { type: TokenTypes.INT, literal: '10' },
+      { type: TokenTypes.RPAREN, literal: ')' },
+      { type: TokenTypes.LBRACE, literal: '{' },
+      { type: TokenTypes.RETURN, literal: 'return' },
+      { type: TokenTypes.TRUE, literal: 'true' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.RBRACE, literal: '}' },
+      { type: TokenTypes.ELSE, literal: 'else' },
+      { type: TokenTypes.LBRACE, literal: '{' },
+      { type: TokenTypes.RETURN, literal: 'return' },
+      { type: TokenTypes.FALSE, literal: 'false' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.RBRACE, literal: '}' },
       { type: TokenTypes.EOF, literal: '' }
     ];
 
