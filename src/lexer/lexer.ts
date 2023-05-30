@@ -43,24 +43,16 @@ const readChar = (l: Lexer): Lexer => {
 
 export const nextToken = (l: Lexer): [Token, Lexer] => {
   let token: Token | undefined;
-  let sLexer = skipWhitespace(l);
+  const sLexer = skipWhitespace(l);
   const sCh = sLexer.ch !== 0 ? String.fromCharCode(sLexer.ch) : 'EOF';
-  let t = TokenLookAhead[sCh];
-  if (t) {
-    if (sLexer.readPosition >= sLexer.input.length) {
-      t = TokenMapping[sCh];
-    } else if (TokenMapping[t + sLexer.input[sLexer.readPosition]]) {
-      sLexer = readChar(sLexer);
-      const newLiteral = t + String.fromCharCode(sLexer.ch);
-      token = {
-        type: TokenMapping[newLiteral],
-        literal: newLiteral
-      };
-      return [token, readChar(sLexer)];
-    }
+
+  const [res, newToken, newLexer] = lookAhead(sLexer);
+
+  if (res) {
+    return [newToken, newLexer];
   }
 
-  t = TokenMapping[sCh];
+  const t = TokenMapping[sCh];
 
   if (!t) {
     if (isLetter(sLexer.ch)) {
@@ -85,6 +77,27 @@ const skipWhitespace = (l: Lexer): Lexer => {
   }
 
   return returnLexer;
+};
+
+const lookAhead = (l: Lexer): [boolean, Token, Lexer] => {
+  const sCh = String.fromCharCode(l.ch);
+  let t = TokenLookAhead[sCh];
+  let token: Token;
+  let sLexer = { ...l };
+  if (t) {
+    if (sLexer.readPosition >= sLexer.input.length) {
+      t = TokenMapping[sCh];
+    } else if (TokenMapping[t + sLexer.input[sLexer.readPosition]]) {
+      sLexer = readChar(sLexer);
+      const newLiteral = t + String.fromCharCode(sLexer.ch);
+      token = {
+        type: TokenMapping[newLiteral],
+        literal: newLiteral
+      };
+      return [true, token, readChar(sLexer)];
+    }
+  }
+  return [false, {} as Token, {} as Lexer];
 };
 
 const isDigit = (ch: byte): boolean => {
