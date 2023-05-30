@@ -52,11 +52,13 @@ describe('Lexer test suite', () => {
 
   test('should parse all the token types', async () => {
     const input = `let five = 5;
-                    let ten = 10;
-                    let add = fn(x, y) {
-                        x + y;
-                    };
-                    let result = add(five, ten)`;
+let ten = 10;
+   let add = fn(x, y) {
+     x + y;
+};
+   let result = add(five, ten);
+   !-/*5;
+   5 < 10 > 5;`;
     const testCases = [
       { type: TokenTypes.LET, literal: 'let' },
       { type: TokenTypes.IDENT, literal: 'five' },
@@ -93,6 +95,19 @@ describe('Lexer test suite', () => {
       { type: TokenTypes.COMMA, literal: ',' },
       { type: TokenTypes.IDENT, literal: 'ten' },
       { type: TokenTypes.RPAREN, literal: ')' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.BANG, literal: '!' },
+      { type: TokenTypes.MINUS, literal: '-' },
+      { type: TokenTypes.SLASH, literal: '/' },
+      { type: TokenTypes.ASTERISK, literal: '*' },
+      { type: TokenTypes.INT, literal: '5' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
+      { type: TokenTypes.INT, literal: '5' },
+      { type: TokenTypes.LT, literal: '<' },
+      { type: TokenTypes.INT, literal: '10' },
+      { type: TokenTypes.RT, literal: '>' },
+      { type: TokenTypes.INT, literal: '5' },
+      { type: TokenTypes.SEMICOLON, literal: ';' },
       { type: TokenTypes.EOF, literal: '' }
     ];
 

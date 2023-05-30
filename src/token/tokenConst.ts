@@ -13,6 +13,12 @@ export const TokenTypes = {
   // Operators
   ASSIGN: '=',
   PLUS: '+',
+  MINUS: '-',
+  BANG: '!',
+  ASTERISK: '*',
+  SLASH: '/',
+  LT: '<',
+  RT: '>',
 
   // Delimiters
   COMMA: ',',
@@ -32,6 +38,12 @@ export const TokenMapping: { [propKey: string]: TokenType } = {
   // Operators
   '=': TokenTypes.ASSIGN,
   '+': TokenTypes.PLUS,
+  '-': TokenTypes.MINUS,
+  '!': TokenTypes.BANG,
+  '*': TokenTypes.ASTERISK,
+  '/': TokenTypes.SLASH,
+  '<': TokenTypes.LT,
+  '>': TokenTypes.RT,
 
   // Delimiters
   ',': TokenTypes.COMMA,
