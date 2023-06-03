@@ -39,6 +39,26 @@ describe('Parser test suite', () => {
     expect(retParser.errors).toHaveLength(3);
     console.log(retParser.errors);
   });
+
+  test('Return statement', async () => {
+    const input = `
+     return 5;
+     return 10;
+     return 9999999;`;
+
+    const l = newLexer(input);
+    const parser = newParser(l);
+
+    const [program] = parseProgram(parser);
+
+    expect(program).not.toBeNull();
+
+    expect(program.statements).toHaveLength(3);
+
+    program.statements.forEach((statement) => {
+      expect(statement.tokenLiteral()).toEqual('return');
+    });
+  });
 });
 
 const testLetStatement = (statement: Statement<unknown>, name: string) => {

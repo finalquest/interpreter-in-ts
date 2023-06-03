@@ -4,9 +4,11 @@ import { TokenTypes } from '../token/tokenConst';
 import { nextToken as nextLexerToken } from '../lexer/lexer';
 import {
   LetStatement,
+  ReturnStatement,
   Statement,
   newIdentifier,
-  newLetStatement
+  newLetStatement,
+  newReturnStatement
 } from '../ast/ast';
 
 export type Parser = {
@@ -67,8 +69,30 @@ const parseStatement = (
     case TokenTypes.LET: {
       return parseLetStatement(parser);
     }
+    case TokenTypes.RETURN: {
+      return parseReturnStatement(parser);
+    }
   }
   return [false, parser];
+};
+
+const parseReturnStatement = (
+  parser: Parser
+): [Statement<ReturnStatement> | boolean, Parser] => {
+  const statement = newReturnStatement({
+    token: parser.curToken
+  });
+
+  //Todo: A implementar. Por ahora no importa lo que viene despues del =
+  //
+
+  let newParser = nextToken(parser);
+
+  while (!curTokenIs(newParser as Parser, TokenTypes.SEMICOLON)) {
+    newParser = nextToken(newParser);
+  }
+
+  return [statement, newParser];
 };
 
 const parseLetStatement = (

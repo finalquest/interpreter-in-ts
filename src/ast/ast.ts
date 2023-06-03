@@ -26,6 +26,11 @@ export interface LetStatement {
   value: Expression<unknown>;
 }
 
+export interface ReturnStatement {
+  token: Token;
+  returnValue: Expression<unknown>;
+}
+
 const newExpression = ({ token, value }: New): Expression<undefined> => {
   const tokenLiteral = () => {
     return token.literal;
@@ -44,6 +49,25 @@ export const newIdentifier = ({ token, value }: New): Identifier<undefined> => {
     string: () => '',
     inner: undefined
   };
+};
+
+export const newReturnStatement = ({
+  token
+}: {
+  token: Token;
+}): Node<ReturnStatement> => {
+  const tokenLiteral = () => {
+    return token.literal;
+  };
+
+  const returnStat = {
+    token,
+    returnValue: newExpression({
+      token: { type: TokenTypes.EOF, literal: '' },
+      value: ''
+    })
+  };
+  return { tokenLiteral, string: () => '', inner: returnStat };
 };
 
 export const newLetStatement = ({
