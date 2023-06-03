@@ -12,7 +12,7 @@ describe('Parser test suite', () => {
     const l = newLexer(input);
     const parser = newParser(l);
 
-    const program = parseProgram(parser);
+    const [program] = parseProgram(parser);
 
     const testCases = ['x', 'y', 'foobar'];
 
@@ -24,6 +24,20 @@ describe('Parser test suite', () => {
       const statement = program.statements[index];
       testLetStatement(statement, testCase);
     });
+  });
+
+  test('test parser handle expected errors', async () => {
+    const input = `
+     let x 5;
+     let = 10;
+     let 838383;`;
+
+    const l = newLexer(input);
+    const parser = newParser(l);
+
+    const [, retParser] = parseProgram(parser);
+    expect(retParser.errors).toHaveLength(3);
+    console.log(retParser.errors);
   });
 });
 

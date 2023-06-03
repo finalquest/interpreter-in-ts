@@ -3,9 +3,7 @@ import { Token, TokenType } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 import { nextToken as nextLexerToken } from '../lexer/lexer';
 import {
-  Identifier,
   LetStatement,
-  Node,
   Statement,
   newIdentifier,
   newLetStatement
@@ -15,6 +13,7 @@ export type Parser = {
   lexer: Lexer;
   curToken: Token;
   peekToken: Token;
+  errors: string[];
 };
 
 export type Program = {
@@ -26,13 +25,14 @@ export const newParser = (lexer: Lexer): Parser => {
   const parser = {
     curToken: { type: '', literal: '' },
     peekToken: { type: '', literal: '' },
-    lexer
+    lexer,
+    errors: []
   };
 
   return nextToken(nextToken(parser));
 };
 
-export const parseProgram = (parser: Parser): Program => {
+export const parseProgram = (parser: Parser): [Program, Parser] => {
   const retProgram: Program = {
     statements: [],
     tokenLiteral: ''
@@ -47,12 +47,13 @@ export const parseProgram = (parser: Parser): Program => {
     }
     innerParser = nextToken(parsedStatement[1]);
   }
-  return retProgram;
+  return [retProgram, innerParser];
 };
 
 export const nextToken = (parser: Parser): Parser => {
   const [token, newLexer] = nextLexerToken(parser.lexer);
   return {
+    ...parser,
     curToken: parser.peekToken,
     peekToken: token,
     lexer: newLexer
@@ -106,7 +107,8 @@ const expectPeek = (parser: Parser, type: TokenType): [boolean, Parser] => {
   if (peekTokenIs(parser, type)) {
     return [true, nextToken(parser)];
   } else {
-    return [false, parser];
+    const newParser = peekError(parser, type);
+    return [false, newParser];
   }
 };
 
@@ -116,4 +118,9 @@ const peekTokenIs = (parser: Parser, type: TokenType): boolean => {
 
 const curTokenIs = (parser: Parser, type: TokenType): boolean => {
   return parser.curToken.type === type;
+};
+
+const peekError = (parser: Parser, tokenType: TokenType): Parser => {
+  const errorMsg = `Expected ${tokenType} got ${parser.peekToken.type}`;
+  return { ...parser, errors: [...parser.errors, errorMsg] };
 };

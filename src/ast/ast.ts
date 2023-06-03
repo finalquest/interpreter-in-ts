@@ -1,6 +1,10 @@
-import { Lexer } from '../lexer/lexer';
 import { Token } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
+
+type New = {
+  token: Token;
+  value: string;
+};
 
 export interface Node<T> {
   string: () => string;
@@ -22,26 +26,14 @@ export interface LetStatement {
   value: Expression<unknown>;
 }
 
-const newExpression = ({
-  token,
-  value
-}: {
-  token: Token;
-  value: string;
-}): Expression<undefined> => {
+const newExpression = ({ token, value }: New): Expression<undefined> => {
   const tokenLiteral = () => {
     return token.literal;
   };
   return { tokenLiteral, string: () => '', inner: undefined };
 };
 
-export const newIdentifier = ({
-  token,
-  value
-}: {
-  token: Token;
-  value: string;
-}): Identifier<undefined> => {
+export const newIdentifier = ({ token, value }: New): Identifier<undefined> => {
   const tokenLiteral = () => {
     return token.literal;
   };
