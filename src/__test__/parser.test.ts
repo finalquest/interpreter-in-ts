@@ -1,12 +1,13 @@
-import { newLexer, nextToken } from '../lexer/lexer';
+import { LetStatement, Statement } from '../ast/ast';
+import { newLexer } from '../lexer/lexer';
 import { newParser, parseProgram } from '../parser/parser';
 
 describe('Parser test suite', () => {
-  test('should parse', async () => {
+  test('Let statements', async () => {
     const input = `
      let x = 5;
      let y = 10;
-     let foobar = 838383 ff`;
+     let foobar = 838383;`;
 
     const l = newLexer(input);
     const parser = newParser(l);
@@ -19,10 +20,14 @@ describe('Parser test suite', () => {
 
     expect(program.statements).toHaveLength(3);
 
-    // let token = nextToken(l);
-    // testCases.forEach((testCase) => {
-    //   expect(token[0]).toEqual(testCase);
-    //   token = nextToken(token[1]);
-    // });
+    testCases.forEach((testCase, index) => {
+      const statement = program.statements[index];
+      testLetStatement(statement, testCase);
+    });
   });
 });
+
+const testLetStatement = (statement: Statement<unknown>, name: string) => {
+  expect(statement.tokenLiteral()).toEqual('let');
+  expect((statement as Statement<LetStatement>).inner.name.value).toEqual(name);
+};

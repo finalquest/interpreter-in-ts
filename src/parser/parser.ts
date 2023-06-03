@@ -1,20 +1,15 @@
-import { Lexer } from '../lexer/lexer';
-import { Token } from '../token/token';
+import { Lexer, newLexer } from '../lexer/lexer';
+import { Token, TokenType } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 import { nextToken as nextLexerToken } from '../lexer/lexer';
-
-export type Statement = {
-  tokenLiteral: () => string;
-};
-
-export type Expression = {
-  tokenLiteral: () => string;
-};
-
-export type Program = {
-  statements: Statement[];
-  tokenLiteral: string;
-};
+import {
+  Identifier,
+  LetStatement,
+  Node,
+  Statement,
+  newIdentifier,
+  newLetStatement
+} from '../ast/ast';
 
 export type Parser = {
   lexer: Lexer;
@@ -22,70 +17,9 @@ export type Parser = {
   peekToken: Token;
 };
 
-export type Identifier = Expression & {
-  token: Token;
-  value: string;
-};
-
-export type LetStatement = Statement & {
-  token: Token;
-  name: Identifier;
-  value: Expression;
-};
-
-const newExpression = ({
-  token,
-  value
-}: {
-  token: Token;
-  value: string;
-}): Expression => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-  return { tokenLiteral };
-};
-
-const newIdentifier = ({
-  token,
-  value
-}: {
-  token: Token;
-  value: string;
-}): Identifier => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-  return {
-    token,
-    value,
-    tokenLiteral
-  };
-};
-
-const newLetStatement = ({
-  token,
-  value
-}: {
-  token: Token;
-  value: string;
-}): LetStatement => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-
-  return {
-    token,
-    value: newExpression({
-      token: { type: TokenTypes.EOF, literal: '' },
-      value: ''
-    }),
-    name: newIdentifier({
-      value: '',
-      token: { type: TokenTypes.EOF, literal: '' }
-    }),
-    tokenLiteral
-  };
+export type Program = {
+  statements: Statement<unknown>[];
+  tokenLiteral: string;
 };
 
 export const newParser = (lexer: Lexer): Parser => {
@@ -103,6 +37,16 @@ export const parseProgram = (parser: Parser): Program => {
     statements: [],
     tokenLiteral: ''
   };
+
+  let innerParser = { ...parser };
+
+  while (innerParser.curToken.type !== TokenTypes.EOF) {
+    const parsedStatement = parseStatement(innerParser);
+    if (parsedStatement[0]) {
+      retProgram.statements.push(parsedStatement[0] as Statement<unknown>);
+    }
+    innerParser = nextToken(parsedStatement[1]);
+  }
   return retProgram;
 };
 
@@ -113,4 +57,63 @@ export const nextToken = (parser: Parser): Parser => {
     peekToken: token,
     lexer: newLexer
   };
+};
+
+const parseStatement = (
+  parser: Parser
+): [Statement<unknown> | boolean, Parser] => {
+  switch (parser.curToken.type) {
+    case TokenTypes.LET: {
+      return parseLetStatement(parser);
+    }
+  }
+  return [false, parser];
+};
+
+const parseLetStatement = (
+  parser: Parser
+): [Statement<LetStatement> | boolean, Parser] => {
+  const letStatement = newLetStatement({
+    token: parser.curToken
+  });
+  let [expected, newParser] = expectPeek(parser, TokenTypes.IDENT);
+  if (!expected) {
+    return [false, newParser];
+  }
+
+  letStatement.inner.name = newIdentifier({
+    token: newParser.curToken,
+    value: newParser.curToken.literal
+  });
+
+  [expected, newParser] = expectPeek(newParser as Parser, TokenTypes.ASSIGN);
+
+  if (!expected) {
+    return [false, newParser];
+  }
+
+  //Todo: A implementar. Por ahora no importa lo que viene despues del =
+  //
+
+  while (!curTokenIs(newParser as Parser, TokenTypes.SEMICOLON)) {
+    newParser = nextToken(newParser);
+  }
+
+  return [letStatement, newParser];
+};
+
+const expectPeek = (parser: Parser, type: TokenType): [boolean, Parser] => {
+  if (peekTokenIs(parser, type)) {
+    return [true, nextToken(parser)];
+  } else {
+    return [false, parser];
+  }
+};
+
+const peekTokenIs = (parser: Parser, type: TokenType): boolean => {
+  return parser.peekToken.type === type;
+};
+
+const curTokenIs = (parser: Parser, type: TokenType): boolean => {
+  return parser.curToken.type === type;
 };
