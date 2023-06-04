@@ -56,12 +56,12 @@ describe('Parser test suite', () => {
     expect(program.statements).toHaveLength(3);
 
     program.statements.forEach((statement) => {
-      expect(statement.tokenLiteral()).toEqual('return');
+      expect(statement.inner.token.literal).toEqual('return');
     });
   });
 });
 
 const testLetStatement = (statement: Statement<unknown>, name: string) => {
-  expect(statement.tokenLiteral()).toEqual('let');
+  expect(statement.inner.token.literal).toEqual('let');
   expect((statement as Statement<LetStatement>).inner.name.value).toEqual(name);
 };

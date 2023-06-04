@@ -6,23 +6,21 @@ type New = {
   value: string;
 };
 
-export interface Node<T> {
-  string: () => string;
-  tokenLiteral: () => string;
+export type Statement<T> = {
+  inner: T & { token: Token };
+};
+
+export type Expression<T> = {
   inner: T;
-}
-export type Statement<T> = Node<T>;
-
-export type Expression<T> = Node<T>;
-
-export type Identifier<T> = Node<T> & {
+};
+export type Identifier = {
   token: Token;
   value: string;
 };
 
 export interface LetStatement {
   token: Token;
-  name: Identifier<unknown>;
+  name: Identifier;
   value: Expression<unknown>;
 }
 
@@ -31,23 +29,14 @@ export interface ReturnStatement {
   returnValue: Expression<unknown>;
 }
 
-const newExpression = ({ token, value }: New): Expression<undefined> => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-  return { tokenLiteral, string: () => '', inner: undefined };
+const newExpression = ({ token, value }: New): Expression<unknown> => {
+  return { inner: undefined };
 };
 
-export const newIdentifier = ({ token, value }: New): Identifier<undefined> => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
+export const newIdentifier = ({ token, value }: New): Identifier => {
   return {
     token,
-    value,
-    tokenLiteral,
-    string: () => '',
-    inner: undefined
+    value
   };
 };
 
@@ -55,11 +44,7 @@ export const newReturnStatement = ({
   token
 }: {
   token: Token;
-}): Node<ReturnStatement> => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-
+}): Statement<ReturnStatement> => {
   const returnStat = {
     token,
     returnValue: newExpression({
@@ -67,18 +52,14 @@ export const newReturnStatement = ({
       value: ''
     })
   };
-  return { tokenLiteral, string: () => '', inner: returnStat };
+  return { inner: returnStat };
 };
 
 export const newLetStatement = ({
   token
 }: {
   token: Token;
-}): Node<LetStatement> => {
-  const tokenLiteral = () => {
-    return token.literal;
-  };
-
+}): Statement<LetStatement> => {
   const letStatement = {
     token,
     value: newExpression({
@@ -92,8 +73,6 @@ export const newLetStatement = ({
   };
 
   return {
-    tokenLiteral,
-    string: () => '',
     inner: letStatement
   };
 };
