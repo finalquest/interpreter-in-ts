@@ -3,11 +3,14 @@ import { Token, TokenType } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 import { nextToken as nextLexerToken } from '../lexer/lexer';
 import {
+  Expression,
   ExpressionStatement,
+  Identifier,
   LetStatement,
   ReturnStatement,
   Statement,
   newExpressionStatement,
+  newIdentExpression,
   newIdentifier,
   newLetStatement,
   newReturnStatement
@@ -139,12 +142,32 @@ const parseExpressionStatement = (
   });
 
   let newParser = { ...parser };
+  const expression = parseExpression(newParser, 'LOWEST');
+
+  statement.inner.expression = expression;
 
   while (!curTokenIs(newParser as Parser, TokenTypes.SEMICOLON)) {
     newParser = nextToken(newParser);
   }
 
   return [statement, newParser];
+};
+
+const parseExpression = (parser: Parser, p: string): Expression<unknown> => {
+  if (parser.curToken.type === TokenTypes.IDENT) {
+    return parseIdentifier(parser);
+  }
+  return newIdentExpression({
+    token: { type: TokenTypes.EOF, literal: '' },
+    value: ''
+  });
+};
+
+const parseIdentifier = (parser: Parser): Expression<Identifier> => {
+  return newIdentExpression({
+    token: parser.curToken,
+    value: parser.curToken.literal
+  });
 };
 
 const expectPeek = (parser: Parser, type: TokenType): [boolean, Parser] => {

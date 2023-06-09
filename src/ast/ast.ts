@@ -7,6 +7,10 @@ export const StatementTypes = {
   EXPRESSION: 'EXPRESSION_STATEMENT'
 };
 
+export const ExpressionTypes = {
+  IDENT: 'IDENT'
+};
+
 type New = {
   token: Token;
   value: string;
@@ -17,8 +21,10 @@ export type Statement<T> = {
   type: string;
 };
 
+// expresions
 export type Expression<T> = {
   inner: T;
+  type: string;
 };
 export type Identifier = {
   token: Token;
@@ -42,7 +48,17 @@ export interface ExpressionStatement {
 }
 
 const newExpression = ({ token, value }: New): Expression<unknown> => {
-  return { inner: undefined };
+  return { inner: undefined, type: ExpressionTypes.IDENT };
+};
+
+export const newIdentExpression = ({
+  token,
+  value
+}: New): Expression<Identifier> => {
+  return {
+    inner: newIdentifier({ token, value }),
+    type: ExpressionTypes.IDENT
+  };
 };
 
 export const newIdentifier = ({ token, value }: New): Identifier => {

@@ -1,7 +1,14 @@
-import { LetStatement, Statement } from '../ast/ast';
+import { Expression } from '../ast/ast';
+import { Identifier } from '../ast/ast';
+import {
+  ExpressionStatement,
+  ExpressionTypes,
+  LetStatement,
+  Statement,
+  StatementTypes
+} from '../ast/ast';
 import { newLexer } from '../lexer/lexer';
 import { newParser, parseProgram } from '../parser/parser';
-import { TokenTypes } from '../token/tokenConst';
 
 describe('Parser test suite', () => {
   test('Let statements', async () => {
@@ -71,11 +78,13 @@ describe('Parser test suite', () => {
     expect(program).not.toBeNull();
 
     expect(program.statements).toHaveLength(1);
-    // expect(program.statements[0].inner.token).toEqual(TokenTypes.)
+    expect(program.statements[0].type).toEqual(StatementTypes.EXPRESSION);
 
-    program.statements.forEach((statement) => {
-      expect(statement.inner.token.literal).toEqual('foobar');
-    });
+    const ident = program.statements[0].inner as ExpressionStatement;
+    expect(ident.expression.type).toEqual(ExpressionTypes.IDENT);
+    expect((ident.expression as Expression<Identifier>).inner.value).toEqual(
+      'foobar'
+    );
   });
 });
 
