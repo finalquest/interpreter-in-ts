@@ -3,9 +3,11 @@ import { Token, TokenType } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 import { nextToken as nextLexerToken } from '../lexer/lexer';
 import {
+  ExpressionStatement,
   LetStatement,
   ReturnStatement,
   Statement,
+  newExpressionStatement,
   newIdentifier,
   newLetStatement,
   newReturnStatement
@@ -72,8 +74,10 @@ const parseStatement = (
     case TokenTypes.RETURN: {
       return parseReturnStatement(parser);
     }
+    default: {
+      return parseExpressionStatement(parser);
+    }
   }
-  return [false, parser];
 };
 
 const parseReturnStatement = (
@@ -125,6 +129,22 @@ const parseLetStatement = (
   }
 
   return [letStatement, newParser];
+};
+
+const parseExpressionStatement = (
+  parser: Parser
+): [Statement<ExpressionStatement> | boolean, Parser] => {
+  const statement = newExpressionStatement({
+    token: parser.curToken
+  });
+
+  let newParser = { ...parser };
+
+  while (!curTokenIs(newParser as Parser, TokenTypes.SEMICOLON)) {
+    newParser = nextToken(newParser);
+  }
+
+  return [statement, newParser];
 };
 
 const expectPeek = (parser: Parser, type: TokenType): [boolean, Parser] => {

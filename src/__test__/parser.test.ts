@@ -1,6 +1,7 @@
 import { LetStatement, Statement } from '../ast/ast';
 import { newLexer } from '../lexer/lexer';
 import { newParser, parseProgram } from '../parser/parser';
+import { TokenTypes } from '../token/tokenConst';
 
 describe('Parser test suite', () => {
   test('Let statements', async () => {
@@ -57,6 +58,23 @@ describe('Parser test suite', () => {
 
     program.statements.forEach((statement) => {
       expect(statement.inner.token.literal).toEqual('return');
+    });
+  });
+
+  test('test indentifier expression', async () => {
+    const input = 'foobar;';
+    const l = newLexer(input);
+    const parser = newParser(l);
+
+    const [program] = parseProgram(parser);
+
+    expect(program).not.toBeNull();
+
+    expect(program.statements).toHaveLength(1);
+    // expect(program.statements[0].inner.token).toEqual(TokenTypes.)
+
+    program.statements.forEach((statement) => {
+      expect(statement.inner.token.literal).toEqual('foobar');
     });
   });
 });

@@ -1,6 +1,12 @@
 import { Token } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 
+export const StatementTypes = {
+  LET_STATEMENT: 'LET_STATEMENT',
+  RETURN: 'RETURN_STATEMENT',
+  EXPRESSION: 'EXPRESSION_STATEMENT'
+};
+
 type New = {
   token: Token;
   value: string;
@@ -8,6 +14,7 @@ type New = {
 
 export type Statement<T> = {
   inner: T & { token: Token };
+  type: string;
 };
 
 export type Expression<T> = {
@@ -27,6 +34,11 @@ export interface LetStatement {
 export interface ReturnStatement {
   token: Token;
   returnValue: Expression<unknown>;
+}
+
+export interface ExpressionStatement {
+  token: Token;
+  expression: Expression<unknown>;
 }
 
 const newExpression = ({ token, value }: New): Expression<unknown> => {
@@ -52,7 +64,7 @@ export const newReturnStatement = ({
       value: ''
     })
   };
-  return { inner: returnStat };
+  return { inner: returnStat, type: StatementTypes.RETURN };
 };
 
 export const newLetStatement = ({
@@ -73,6 +85,22 @@ export const newLetStatement = ({
   };
 
   return {
-    inner: letStatement
+    inner: letStatement,
+    type: StatementTypes.LET_STATEMENT
   };
+};
+
+export const newExpressionStatement = ({
+  token
+}: {
+  token: Token;
+}): Statement<ExpressionStatement> => {
+  const expStatement = {
+    token,
+    expression: newExpression({
+      value: '',
+      token: { type: TokenTypes.EOF, literal: '' }
+    })
+  };
+  return { inner: expStatement, type: StatementTypes.EXPRESSION };
 };
