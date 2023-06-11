@@ -85,6 +85,29 @@ describe('Parser test suite', () => {
     expect((ident.expression as Expression<Identifier>).inner.value).toEqual(
       'foobar'
     );
+    expect(
+      (ident.expression as Expression<Identifier>).inner.token.literal
+    ).toEqual('foobar');
+  });
+
+  test('test integer literal', async () => {
+    const input = '5;';
+    const l = newLexer(input);
+    const parser = newParser(l);
+
+    const [program] = parseProgram(parser);
+
+    expect(program).not.toBeNull();
+
+    expect(program.statements).toHaveLength(1);
+    expect(program.statements[0].type).toEqual(StatementTypes.EXPRESSION);
+
+    const ident = program.statements[0].inner as ExpressionStatement;
+    expect(ident.expression.type).toEqual(ExpressionTypes.INTEGERL);
+    expect((ident.expression as Expression<Identifier>).inner.value).toEqual(5);
+    expect(
+      (ident.expression as Expression<Identifier>).inner.token.literal
+    ).toEqual('5');
   });
 });
 

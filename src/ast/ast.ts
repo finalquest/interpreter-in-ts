@@ -1,3 +1,4 @@
+import { on } from 'events';
 import { Token } from '../token/token';
 import { TokenTypes } from '../token/tokenConst';
 
@@ -8,7 +9,8 @@ export const StatementTypes = {
 };
 
 export const ExpressionTypes = {
-  IDENT: 'IDENT'
+  IDENT: 'IDENT',
+  INTEGERL: 'INTEGER_LITERAL'
 };
 
 type New = {
@@ -29,6 +31,10 @@ export type Expression<T> = {
 export type Identifier = {
   token: Token;
   value: string;
+};
+export type IntegerLiteral = {
+  token: Token;
+  value: number;
 };
 
 export interface LetStatement {
@@ -61,11 +67,25 @@ export const newIdentExpression = ({
   };
 };
 
+export const newIntLExpression = ({
+  token,
+  value
+}: New): Expression<IntegerLiteral> => {
+  return {
+    inner: newIntegerLiteral({ token, value }),
+    type: ExpressionTypes.INTEGERL
+  };
+};
+
 export const newIdentifier = ({ token, value }: New): Identifier => {
   return {
     token,
     value
   };
+};
+
+export const newIntegerLiteral = ({ token, value }: New): IntegerLiteral => {
+  return { token, value: parseInt(value, 10) };
 };
 
 export const newReturnStatement = ({

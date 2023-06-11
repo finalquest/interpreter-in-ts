@@ -6,12 +6,14 @@ import {
   Expression,
   ExpressionStatement,
   Identifier,
+  IntegerLiteral,
   LetStatement,
   ReturnStatement,
   Statement,
   newExpressionStatement,
   newIdentExpression,
   newIdentifier,
+  newIntLExpression,
   newLetStatement,
   newReturnStatement
 } from '../ast/ast';
@@ -108,6 +110,7 @@ const parseLetStatement = (
   const letStatement = newLetStatement({
     token: parser.curToken
   });
+
   let [expected, newParser] = expectPeek(parser, TokenTypes.IDENT);
   if (!expected) {
     return [false, newParser];
@@ -157,6 +160,9 @@ const parseExpression = (parser: Parser, p: string): Expression<unknown> => {
   if (parser.curToken.type === TokenTypes.IDENT) {
     return parseIdentifier(parser);
   }
+  if (parser.curToken.type === TokenTypes.INT) {
+    return parseIntegerLiteral(parser);
+  }
   return newIdentExpression({
     token: { type: TokenTypes.EOF, literal: '' },
     value: ''
@@ -170,6 +176,12 @@ const parseIdentifier = (parser: Parser): Expression<Identifier> => {
   });
 };
 
+const parseIntegerLiteral = (parser: Parser): Expression<IntegerLiteral> => {
+  return newIntLExpression({
+    token: parser.curToken,
+    value: parser.curToken.literal
+  });
+};
 const expectPeek = (parser: Parser, type: TokenType): [boolean, Parser] => {
   if (peekTokenIs(parser, type)) {
     return [true, nextToken(parser)];
