@@ -1,4 +1,4 @@
-import { Expression } from '../ast/ast';
+import { Expression, IntegerLiteral, PrefixExpression } from '../ast/ast';
 import { Identifier } from '../ast/ast';
 import {
   ExpressionStatement,
@@ -8,7 +8,7 @@ import {
   StatementTypes
 } from '../ast/ast';
 import { newLexer } from '../lexer/lexer';
-import { newParser, parseProgram } from '../parser/parser';
+import { Parser, newParser, parseProgram } from '../parser/parser';
 
 describe('Parser test suite', () => {
   test('Let statements', async () => {
@@ -44,7 +44,7 @@ describe('Parser test suite', () => {
     const parser = newParser(l);
 
     const [, retParser] = parseProgram(parser);
-    expect(retParser.errors).toHaveLength(3);
+    expect(retParser.errors).toHaveLength(4);
     console.log(retParser.errors);
   });
 
@@ -81,7 +81,7 @@ describe('Parser test suite', () => {
     expect(program.statements[0].type).toEqual(StatementTypes.EXPRESSION);
 
     const ident = program.statements[0].inner as ExpressionStatement;
-    expect(ident.expression.type).toEqual(ExpressionTypes.IDENT);
+    expect(ident.expression?.type).toEqual(ExpressionTypes.IDENT);
     expect((ident.expression as Expression<Identifier>).inner.value).toEqual(
       'foobar'
     );
@@ -103,13 +103,64 @@ describe('Parser test suite', () => {
     expect(program.statements[0].type).toEqual(StatementTypes.EXPRESSION);
 
     const ident = program.statements[0].inner as ExpressionStatement;
-    expect(ident.expression.type).toEqual(ExpressionTypes.INTEGERL);
-    expect((ident.expression as Expression<Identifier>).inner.value).toEqual(5);
+    expect(ident.expression?.type).toEqual(ExpressionTypes.INTEGERL);
+    expect(
+      (ident.expression as Expression<IntegerLiteral>).inner.value
+    ).toEqual(5);
     expect(
       (ident.expression as Expression<Identifier>).inner.token.literal
     ).toEqual('5');
   });
+
+  test.only('test parse prefix expression', async () => {
+    const testCases = [
+      {
+        input: '!5;',
+        operator: '!',
+        value: 5
+      },
+      { inptu: '-15;', operator: '-', value: 15 }
+    ];
+
+    testCases.forEach((testCase) => {
+      const l = newLexer(testCase.input as string);
+      const parser = newParser(l);
+
+      const [program, retParser] = parseProgram(parser);
+
+      checkParseErrors(retParser);
+      expect(program).not.toBeNull();
+
+      expect(program.statements).toHaveLength(1);
+      expect(program.statements[0].type).toEqual(StatementTypes.EXPRESSION);
+
+      const ident = program.statements[0].inner as ExpressionStatement;
+      expect(ident.expression?.type).toEqual(ExpressionTypes.PREFIX);
+      const exp = ident.expression as Expression<PrefixExpression>;
+      expect(exp.inner.operator).toEqual(testCase.operator);
+      testIntegerLiteral(
+        exp.inner.right as Expression<IntegerLiteral>,
+        testCase.value
+      );
+    });
+  });
 });
+
+const checkParseErrors = (parser: Parser) => {
+  if (parser.errors.length === 0) {
+    return;
+  }
+  console.log(parser.errors);
+  throw new Error('Parser has errors');
+};
+const testIntegerLiteral = (
+  expression: Expression<IntegerLiteral>,
+  value: number
+) => {
+  expect(expression.type).toEqual(ExpressionTypes.INTEGERL);
+  expect(expression.inner.value).toEqual(value);
+  expect(expression.inner.token.literal).toEqual(value.toString());
+};
 
 const testLetStatement = (statement: Statement<unknown>, name: string) => {
   expect(statement.inner.token.literal).toEqual('let');

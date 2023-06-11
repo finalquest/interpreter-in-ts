@@ -10,7 +10,8 @@ export const StatementTypes = {
 
 export const ExpressionTypes = {
   IDENT: 'IDENT',
-  INTEGERL: 'INTEGER_LITERAL'
+  INTEGERL: 'INTEGER_LITERAL',
+  PREFIX: 'PREFIX_EXPRESSION'
 };
 
 type New = {
@@ -36,6 +37,11 @@ export type IntegerLiteral = {
   token: Token;
   value: number;
 };
+export type PrefixExpression = {
+  token: Token;
+  operator: string;
+  right: Expression<unknown>;
+};
 
 export interface LetStatement {
   token: Token;
@@ -50,7 +56,7 @@ export interface ReturnStatement {
 
 export interface ExpressionStatement {
   token: Token;
-  expression: Expression<unknown>;
+  expression: Expression<unknown> | undefined;
 }
 
 const newExpression = ({ token, value }: New): Expression<unknown> => {

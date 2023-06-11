@@ -144,11 +144,11 @@ const parseExpressionStatement = (
     token: parser.curToken
   });
 
-  let newParser = { ...parser };
-  const expression = parseExpression(newParser, 'LOWEST');
+  const [expression, retParser] = parseExpression(parser, 'LOWEST');
 
   statement.inner.expression = expression;
 
+  let newParser = { ...retParser };
   while (!curTokenIs(newParser as Parser, TokenTypes.SEMICOLON)) {
     newParser = nextToken(newParser);
   }
@@ -156,17 +156,30 @@ const parseExpressionStatement = (
   return [statement, newParser];
 };
 
-const parseExpression = (parser: Parser, p: string): Expression<unknown> => {
+const parseExpression = (
+  parser: Parser,
+  p: string
+): [Expression<unknown> | undefined, Parser] => {
+  const leftExpression = parsePrefix(parser);
+  const newParser = { ...parser };
+  if (leftExpression === undefined) {
+    newParser.errors.push(
+      `No prefix parse function for ${parser.curToken.type} found`
+    );
+  }
+
+  return [leftExpression, newParser];
+};
+
+const parsePrefix = (parser: Parser): Expression<unknown> | undefined => {
   if (parser.curToken.type === TokenTypes.IDENT) {
     return parseIdentifier(parser);
   }
   if (parser.curToken.type === TokenTypes.INT) {
     return parseIntegerLiteral(parser);
   }
-  return newIdentExpression({
-    token: { type: TokenTypes.EOF, literal: '' },
-    value: ''
-  });
+
+  return undefined;
 };
 
 const parseIdentifier = (parser: Parser): Expression<Identifier> => {
